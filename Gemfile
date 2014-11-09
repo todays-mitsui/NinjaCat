@@ -8,3 +8,4 @@ gem "nokogiri", "= 1.6.1"
 gem "mongo", "~> 1.9.2"
 gem "bson_ext", "~> 1.9.2"
 
+gem "addressable", "~> 2.3.6"
