@@ -7,7 +7,8 @@ require 'open-uri'
 
 class Addressable::URI
   def try(limit=10)
-    return fetch(self, limit).code == "200"
+    res = fetch(self, limit)
+    return res.code == "200" unless res.nil?
   end
 
   def fetch(uri, limit)
@@ -20,14 +21,20 @@ class Addressable::URI
     proxy = Net::HTTP::Proxy(proxy_host, proxy_port)
 
     uri = uri.normalize
-    http = proxy.new(uri.host, uri.inferred_port)       # <= 日本語 URL 対応 ( Proxy 考慮 )
-    http.open_timeout = 10
-    http.read_timeout = 20
-    if uri.scheme == "https"
-      http.use_ssl = true
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    begin
+      http = proxy.new(uri.host, uri.inferred_port)
+      http.open_timeout = 20
+      http.read_timeout = 40
+      if uri.scheme == "https"
+        http.use_ssl = true
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      end
+      #res = http.request(Net::HTTP::Get.new(uri.path))
+      res = http.request_head(uri)
+    rescue Timeout::Error
+      puts "[Error] HTTP request timeout"
+    rescue
     end
-    res = http.request(Net::HTTP::Get.new(uri.path))
 
     # レスポンス判定
     case res
