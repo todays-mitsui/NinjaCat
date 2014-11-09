@@ -1,4 +1,4 @@
-# NinJaCat
+# NinjaCat
 Ninja + Cat -> NinjaCat  
   
 Wasshoi!!
